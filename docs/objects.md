@@ -1,4 +1,4 @@
-conference
+Conference
     - name
     - code
     - pin
@@ -7,7 +7,7 @@ conference
     - joinRobot
     - joinParticipant
     - changeView
-robot
+Robot
     - name
     - image
     - video
@@ -16,7 +16,7 @@ robot
     - playVideo
     - playAudio
 
-participant
+WebRTCParticipant
     - name
     - sdpOffer
     - sdpAnswer
