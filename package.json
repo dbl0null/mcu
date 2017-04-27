@@ -1,0 +1,19 @@
+{
+  "name": "mcu",
+  "version": "0.0.1",
+  "description": "mcu",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghafran/mcu.git"
+  },
+  "author": "Ghafran Abbas <magic.mike@gmail.com> (https://github.com/ghafran)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ghafran/mcu/issues"
+  },
+  "homepage": "https://github.com/ghafran/mcu#readme"
+}
