@@ -22,7 +22,7 @@ robot.join(conference).then(() => {
 // join webrtc participant
 var participant = new mcu.WebRTCParticipant({
     name: 'robot',
-    offer: '' // get offer from RTCPeerConnection
+    offer: '', // get offer from RTCPeerConnection
     iceCandidates: [] // get initial ice candidates from RTCPeerConnection
 });
 
@@ -30,12 +30,4 @@ participant.join(conference).then((answer) => {
     // send answer to remote RTCPeerConnection
     // answer will include iceCandidates for mcu
     console.log('webtrc participant joined sucessfully.');
-});
-
-// configure conference
-conference.joinRobot(robot).then(() => {
-    console.log('robot joined sucessfully.');
-    return conference.joinParticipant(participant).then(() => {
-        console.log('participant joined sucessfully.');
-    });
 });
