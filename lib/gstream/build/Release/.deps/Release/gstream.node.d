@@ -1,1 +1,0 @@
-cmd_Release/gstream.node := c++ -bundle -undefined dynamic_lookup -Wl,-no_pie -Wl,-search_paths_first -mmacosx-version-min=10.7 -arch x86_64 -L./Release -stdlib=libc++  -o Release/gstream.node Release/obj.target/gstream/gstream.o Release/obj.target/gstream/stream.o 

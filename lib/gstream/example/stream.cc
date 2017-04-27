@@ -19,7 +19,7 @@ void Stream::Init() {
 
 void Stream::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Stream* obj = new Stream();
-  obj->conference_ = info[0]->IsUndefined() ? 0 : info[0]->Conference();
+  obj->val_ = info[0]->IsUndefined() ? 0 : info[0]->NumberValue();
   obj->Wrap(info.This());
 
   info.GetReturnValue().Set(info.This());

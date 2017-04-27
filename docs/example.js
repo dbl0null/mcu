@@ -3,7 +3,7 @@ var mcu = require('mcu');
 
 // create a conference instance
 var conference = new mcu.Conference({
-    conference_id: 'conference1',
+    conferenceId: 'conference1',
     defaultView: 'composite'
 });
 
