@@ -22,9 +22,9 @@ var participant = new mcu.participant({
     iceCandidates: [] // get initial ice candidates from RTCPeerConnection
 });
 
-participant.processOffer(offer).then((sdpAnswer) => {
+participant.processOffer(offer).then((answer) => {
     // send answer to remote RTCPeerConnection
-
+    // answer will include iceCandidates for mcu
 });
 
 // configure conference
