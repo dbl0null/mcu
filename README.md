@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/ghafran/mcu.png)](http://travis-ci.org/ghafran/mcu)
+
 # mcu
 MCU for webrtc
 
