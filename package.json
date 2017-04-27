@@ -1,19 +1,45 @@
 {
   "name": "mcu",
   "version": "0.0.1",
-  "description": "mcu",
-  "main": "index.js",
+  "description": "A multipoint control unit (MCU) to bridge video conferencing. Oh yea, in nodejs.",
+  "main": "./lib/mcu.js",
   "scripts": {
     "test": "gulp test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ghafran/mcu.git"
+    "url": "https://github.com/ghafran/mcu.git"
   },
-  "author": "Ghafran Abbas <magic.mike@gmail.com> (https://github.com/ghafran)",
+  "keywords": [
+    "mcu",
+    "webrtc",
+    "sdp",
+    "sip",
+    "rtcpeerconnection",
+    "gstreamer",
+    "conference",
+    "video"
+  ],
+  "author": "Ghafran Abbas (https://github.com/ghafran)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ghafran/mcu/issues"
   },
-  "homepage": "https://github.com/ghafran/mcu#readme"
+  "homepage": "https://github.com/ghafran/mcu#readme",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "chai": "^3.5.0",
+    "chalk": "^1.1.3",
+    "chance": "^1.0.6",
+    "gulp": "^3.9.1",
+    "gulp-jshint": "^2.0.4",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-mocha": "^4.3.1",
+    "jshint": "^2.9.4",
+    "jshint-stylish": "^2.2.1",
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "run-sequence": "^1.2.2"
+  }
 }

@@ -3,15 +3,13 @@ var mcu = require('mcu');
 
 // create a conference instance
 var conference = new mcu.Conference({
-    name: 'test conference',
-    code: 'test',
-    pin: '1234',
+    conference_id: 'conference1',
     defaultView: 'composite'
 });
 
 // join robot
 var robot = new mcu.Robot({
-    name: 'robot',
+    robot_id: 'robot1',
     image: 'http://placehold.it/1280x720' // url or local file path
 });
 
@@ -21,7 +19,7 @@ robot.join(conference).then(() => {
 
 // join webrtc participant
 var participant = new mcu.WebRTCParticipant({
-    name: 'robot',
+    participant_id: 'participant1',
     offer: '', // get offer from RTCPeerConnection
     iceCandidates: [] // get initial ice candidates from RTCPeerConnection
 });
@@ -29,5 +27,5 @@ var participant = new mcu.WebRTCParticipant({
 participant.join(conference).then((answer) => {
     // send answer to remote RTCPeerConnection
     // answer will include iceCandidates for mcu
-    console.log('webtrc participant joined sucessfully.');
+    console.log('webtrc participant joined sucessfully.', answer);
 });

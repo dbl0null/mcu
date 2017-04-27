@@ -1,12 +1,11 @@
 Conference
-    - name
-    - code
-    - pin
+    - conference_id
     - defaultView
 
     - joinRobot
     - joinParticipant
     - changeView
+    - focusView
 Robot
     - name
     - image
