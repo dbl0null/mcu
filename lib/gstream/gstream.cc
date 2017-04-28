@@ -41,35 +41,20 @@ using v8::Null;
 
 void CreateStream(const FunctionCallbackInfo<Value>& args) {
     std::cout << "CreateStream" << std::endl;
-     Isolate* isolate = args.GetIsolate();
+    Isolate* isolate = args.GetIsolate();
+    Local<Function> cb = Local<Function>::Cast(args[1]);
 
     // basic validation
-    // if(args.Length() != 1) {
-    //     isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: 1 parameters expected")));
-    //     return;
-    // }
-    //
-    // if(!args[0]->IsObject()) {
-    //     isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")));
-    //     return;
-    // }
-
-    Stream::NewInstance(args);
-
-    // Isolate* isolate = args.GetIsolate();
-    // Local<Function> cb = Local<Function>::Cast(args[1]);
-
-    // basic validation
-    // if(args.Length() != 2) {
-    //     Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: 2 parameters expected")) };
-    //     cb->Call(Null(isolate), 1, argv);
-    //     return;
-    // }
-    // if(!args[0]->IsObject()) {
-    //     Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")) };
-    //     cb->Call(Null(isolate), 1, argv);
-    //     return;
-    // }
+    if(args.Length() != 2) {
+        Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: 2 parameters expected")) };
+        cb->Call(Null(isolate), 1, argv);
+        return;
+    }
+    if(!args[0]->IsObject()) {
+        Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")) };
+        cb->Call(Null(isolate), 1, argv);
+        return;
+    }
 
     // parse options
     // Local<Context> context = isolate->GetCurrentContext();
@@ -83,15 +68,15 @@ void CreateStream(const FunctionCallbackInfo<Value>& args) {
     // stream->Set(String::NewFromUtf8(isolate, "conferenceId"), String::NewFromUtf8(isolate, "asdf"));
     // Local<v8::String> conferenceId = String::NewFromUtf8(isolate, "conf1");
     // Stream* stream = new Stream();
-    // std::cout << "CreateStream: creating stream..." << std::endl;
-    // Stream::NewInstance(args);
-    //
-    // std::cout << "CreateStream: doing callback..." << std::endl;
-    // // callback results
-    // Local<Value> err = v8::Null(isolate);
-    // Local<Value> gstream = stream;
-    // Local<Value> argv[2] = { err, gstream };
-    // cb->Call(Null(isolate), 2, argv);
+    std::cout << "CreateStream: creating stream..." << std::endl;
+    Local<Object> stream = Stream::NewInstance(args);
+
+    std::cout << "CreateStream: doing callback..." << std::endl;
+    // callback results
+    Local<Value> err = v8::Null(isolate);
+    Local<Value> gstream = stream;
+    Local<Value> argv[2] = { err, gstream };
+    cb->Call(Null(isolate), 2, argv);
 }
 
 void Init(Local<Object> exports) {

@@ -12,10 +12,11 @@ using v8::Object;
 using v8::Persistent;
 using v8::String;
 using v8::Value;
+using v8::MaybeLocal;
 
 Persistent<Function> Stream::constructor;
 
-Stream::Stream(double value) : value_(value) {
+Stream::Stream() {
 }
 
 Stream::~Stream() {
@@ -51,7 +52,7 @@ void Stream::New(const FunctionCallbackInfo<Value>& args) {
     }
 }
 
-void Stream::NewInstance(const FunctionCallbackInfo<Value>& args) {
+Local<Object> Stream::NewInstance(const FunctionCallbackInfo<Value>& args) {
     std::cout << "Stream::NewInstance" << std::endl;
     Isolate* isolate = args.GetIsolate();
 
@@ -59,6 +60,10 @@ void Stream::NewInstance(const FunctionCallbackInfo<Value>& args) {
     Local<Value> argv[argc] = { args[0] };
     Local<Function> cons = Local<Function>::New(isolate, constructor);
     Local<Context> context = isolate->GetCurrentContext();
-    Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
-    args.GetReturnValue().Set(instance);
+    std::cout << "Stream::NewInstance" << std::endl;
+    MaybeLocal<v8::Object> maybe = cons->NewInstance(context, argc, argv);
+    std::cout << "Stream::NewInstance" << std::endl;
+    Local<Object> instance = maybe.ToLocalChecked();
+    return instance;
+    // args.GetReturnValue().Set(instance);
 }
