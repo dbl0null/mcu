@@ -1,5 +1,5 @@
-#ifndef MYOBJECT_H
-#define MYOBJECT_H
+#ifndef STREAM_H
+#define STREAM_H
 
 #include <nan.h>
 
