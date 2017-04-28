@@ -15,7 +15,7 @@ using v8::Value;
 
 Persistent<Function> Stream::constructor;
 
-Stream::Stream() {
+Stream::Stream(double value) : value_(value) {
 }
 
 Stream::~Stream() {
@@ -55,8 +55,8 @@ void Stream::NewInstance(const FunctionCallbackInfo<Value>& args) {
     std::cout << "Stream::NewInstance" << std::endl;
     Isolate* isolate = args.GetIsolate();
 
-    const unsigned argc = 0;
-    Local<Value> argv[argc] = {  };
+    const unsigned argc = 1;
+    Local<Value> argv[argc] = { args[0] };
     Local<Function> cons = Local<Function>::New(isolate, constructor);
     Local<Context> context = isolate->GetCurrentContext();
     Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();

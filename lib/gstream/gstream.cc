@@ -44,15 +44,15 @@ void CreateStream(const FunctionCallbackInfo<Value>& args) {
      Isolate* isolate = args.GetIsolate();
 
     // basic validation
-    if(args.Length() != 1) {
-        isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: 1 parameters expected")));
-        return;
-    }
-
-    if(!args[0]->IsObject()) {
-        isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")));
-        return;
-    }
+    // if(args.Length() != 1) {
+    //     isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: 1 parameters expected")));
+    //     return;
+    // }
+    //
+    // if(!args[0]->IsObject()) {
+    //     isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")));
+    //     return;
+    // }
 
     Stream::NewInstance(args);
 
