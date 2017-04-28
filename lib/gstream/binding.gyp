@@ -2,7 +2,7 @@
   "targets": [
     {
       "target_name": "gstream",
-      "sources": [ "gstream.cc" ]
+      "sources": [ "gstream.cc", "stream.cc" ]
     }
   ]
 }
