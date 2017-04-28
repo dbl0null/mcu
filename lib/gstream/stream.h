@@ -21,16 +21,15 @@ using v8::Null;
 
 class Stream : public node::ObjectWrap {
     public:
-        static void Init(v8::Local<v8::Object> exports);
+        static void Init(v8::Isolate* isolate);
+        static void NewInstance(const v8::FunctionCallbackInfo<v8::Value>& args);
 
     private:
-        explicit Stream(Local<v8::String> conferenceId);
-        ~Stream();
+     explicit Stream();
+     ~Stream();
 
-        static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
-        static void AddRobot(const v8::FunctionCallbackInfo<v8::Value>& args);
-        static v8::Persistent<v8::Function> constructor;
-        Local<v8::String> conferenceId_;
+     static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
+     static v8::Persistent<v8::Function> constructor;
 };
 
 #endif

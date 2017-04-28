@@ -40,17 +40,36 @@ using v8::Null;
 // }
 
 void CreateStream(const FunctionCallbackInfo<Value>& args) {
-    Isolate* isolate = args.GetIsolate();
+    std::cout << "CreateStream" << std::endl;
+     Isolate* isolate = args.GetIsolate();
 
     // basic validation
-    if(args.Length() != 2) {
-        isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: 2 parameters expected")));
+    if(args.Length() != 1) {
+        isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: 1 parameters expected")));
         return;
     }
+
     if(!args[0]->IsObject()) {
         isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")));
         return;
     }
+
+    Stream::NewInstance(args);
+
+    // Isolate* isolate = args.GetIsolate();
+    // Local<Function> cb = Local<Function>::Cast(args[1]);
+
+    // basic validation
+    // if(args.Length() != 2) {
+    //     Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: 2 parameters expected")) };
+    //     cb->Call(Null(isolate), 1, argv);
+    //     return;
+    // }
+    // if(!args[0]->IsObject()) {
+    //     Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")) };
+    //     cb->Call(Null(isolate), 1, argv);
+    //     return;
+    // }
 
     // parse options
     // Local<Context> context = isolate->GetCurrentContext();
@@ -62,21 +81,22 @@ void CreateStream(const FunctionCallbackInfo<Value>& args) {
     // create return object
     // Local<Object> stream = Object::New(isolate);
     // stream->Set(String::NewFromUtf8(isolate, "conferenceId"), String::NewFromUtf8(isolate, "asdf"));
-    Stream* obj = new Stream(String::NewFromUtf8(isolate, "c1"));
-
-    // callback results
-    Local<Function> cb = Local<Function>::Cast(args[1]);
-    Local<Value> err = v8::Null(isolate);
-    Local<Value> gstream = stream;
-    const unsigned argc = 2; // number of returned parameters
-    Local<Value> argv[argc] = { err, gstream };
-    cb->Call(Null(isolate), argc, argv);
+    // Local<v8::String> conferenceId = String::NewFromUtf8(isolate, "conf1");
+    // Stream* stream = new Stream();
+    // std::cout << "CreateStream: creating stream..." << std::endl;
+    // Stream::NewInstance(args);
+    //
+    // std::cout << "CreateStream: doing callback..." << std::endl;
+    // // callback results
+    // Local<Value> err = v8::Null(isolate);
+    // Local<Value> gstream = stream;
+    // Local<Value> argv[2] = { err, gstream };
+    // cb->Call(Null(isolate), 2, argv);
 }
 
 void Init(Local<Object> exports) {
     std::cout << "Init" << std::endl;
     NODE_SET_METHOD(exports, "createStream", CreateStream);
-    Stream::Init(exports);
 }
 
 NODE_MODULE(gstream, Init);

@@ -15,26 +15,19 @@ using v8::Value;
 
 Persistent<Function> Stream::constructor;
 
-Stream::Stream(Local<v8::String> conferenceId) : conferenceId_(conferenceId) {
+Stream::Stream() {
 }
 
 Stream::~Stream() {
 }
 
-void Stream::Init(Local<Object> exports) {
+void Stream::Init(Isolate* isolate) {
     std::cout << "Stream::Init" << std::endl;
-    Isolate* isolate = exports->GetIsolate();
-
     // Prepare constructor template
     Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, New);
     tpl->SetClassName(String::NewFromUtf8(isolate, "Stream"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
-
-    // Prototype
-    NODE_SET_PROTOTYPE_METHOD(tpl, "addRobot", AddRobot);
-
     constructor.Reset(isolate, tpl->GetFunction());
-    exports->Set(String::NewFromUtf8(isolate, "Stream"), tpl->GetFunction());
 }
 
 void Stream::New(const FunctionCallbackInfo<Value>& args) {
@@ -43,8 +36,8 @@ void Stream::New(const FunctionCallbackInfo<Value>& args) {
 
     if (args.IsConstructCall()) {
         // Invoked as constructor: `new Stream(...)`
-        Local<v8::String> conferenceId = args[0]->ToString();
-        Stream* obj = new Stream(conferenceId);
+        // double value = args[0]->IsUndefined() ? 0 : args[0]->NumberValue();
+        Stream* obj = new Stream();
         obj->Wrap(args.This());
         args.GetReturnValue().Set(args.This());
     } else {
@@ -53,21 +46,19 @@ void Stream::New(const FunctionCallbackInfo<Value>& args) {
         Local<Value> argv[argc] = { args[0] };
         Local<Context> context = isolate->GetCurrentContext();
         Local<Function> cons = Local<Function>::New(isolate, constructor);
-        Local<Object> result = cons->NewInstance(context, argc, argv).ToLocalChecked();
-        args.GetReturnValue().Set(result);
+        Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
+        args.GetReturnValue().Set(instance);
     }
 }
 
-void Stream::AddRobot(const FunctionCallbackInfo<Value>& args) {
-    std::cout << "Stream::AddRobot" << std::endl;
+void Stream::NewInstance(const FunctionCallbackInfo<Value>& args) {
+    std::cout << "Stream::NewInstance" << std::endl;
     Isolate* isolate = args.GetIsolate();
-    Stream* stream = ObjectWrap::Unwrap<Stream>(args.Holder());
 
-    // callback results
-    Local<Function> cb = Local<Function>::Cast(args[1]);
-    Local<Value> err = v8::Null(isolate);
-    Local<Value> robot = v8::Null(isolate);
-    const unsigned argc = 2; // number of returned parameters
-    Local<Value> argv[argc] = { err, robot };
-    cb->Call(Null(isolate), argc, argv);
+    const unsigned argc = 0;
+    Local<Value> argv[argc] = {  };
+    Local<Function> cons = Local<Function>::New(isolate, constructor);
+    Local<Context> context = isolate->GetCurrentContext();
+    Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
+    args.GetReturnValue().Set(instance);
 }
