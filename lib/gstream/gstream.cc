@@ -1,27 +1,38 @@
 #include <nan.h>
-#include "stream.h"
 
-using namespace v8;
+using v8::Function;
+using v8::FunctionTemplate;
+using v8::Handle;
+using v8::Object;
+using v8::String;
+using v8::Local;
+using v8::Number;
+using v8::Value;
+using Nan::GetFunction;
+using Nan::New;
+using Nan::Set;
+using Nan::AsyncQueueWorker;
+using Nan::AsyncWorker;
+using Nan::Callback;
+using Nan::HandleScope;
+using Nan::Null;
+using Nan::To;
 
-void CreateStream(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  info.GetReturnValue().Set(Stream::NewInstance(info[0]));
+NAN_METHOD(CreateStream) {
+    // parse info[0] as conference object
+  Callback *callback = new Callback(info[1].As<Function>());
+
+  Local<Value> argv[] = {
+      Null() // err is null
+    , New<Number>(25) // return object
+  };
+  callback->Call(2, argv);
 }
 
-void Add(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  Stream* obj1 = Nan::ObjectWrap::Unwrap<Stream>(info[0]->ToObject());
-  Stream* obj2 = Nan::ObjectWrap::Unwrap<Stream>(info[1]->ToObject());
-  double sum = obj1->Val() + obj2->Val();
-  info.GetReturnValue().Set(Nan::New(sum));
+NAN_MODULE_INIT(InitAll) {
+
+  Set(target, New<String>("createStream").ToLocalChecked(),
+    GetFunction(New<FunctionTemplate>(CreateStream)).ToLocalChecked());
 }
 
-void InitAll(v8::Local<v8::Object> exports) {
-  Stream::Init();
-
-  exports->Set(Nan::New("createStream").ToLocalChecked(),
-      Nan::New<v8::FunctionTemplate>(CreateStream)->GetFunction());
-
-  exports->Set(Nan::New("add").ToLocalChecked(),
-      Nan::New<v8::FunctionTemplate>(Add)->GetFunction());
-}
-
-NODE_MODULE(gstream, InitAll)
+NODE_MODULE(gstream, InitAll);
