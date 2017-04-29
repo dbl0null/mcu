@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "A multipoint control unit (MCU) to bridge video conferencing. Oh yea, in nodejs.",
   "main": "./lib/mcu.js",
+  "gypfile": true,
   "scripts": {
     "test": "gulp test"
   },

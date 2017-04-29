@@ -28,7 +28,7 @@ gulp.task('unit', function () {
     return gulp
         .src(['test/unit/**/*.js', '!node_modules/**/*'])
         .pipe($.mocha({
-            reporter: 'dot'
+            reporter: 'spec'
         }));
 });
 

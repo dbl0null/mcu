@@ -79,18 +79,11 @@ namespace gstream {
         Isolate* isolate = args.GetIsolate();
         Stream* stream = ObjectWrap::Unwrap<Stream>(args.Holder());
         Local<Function> cb = Local<Function>::Cast(args[1]);
-
-        if(args.Length() != 2) {
-            Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: 2 parameters expected")) };
-            cb->Call(Null(isolate), 1, argv);
-            return;
-        }
-        if(!args[0]->IsObject()) {
-            Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")) };
-            cb->Call(Null(isolate), 1, argv);
-            return;
-        }
-
+        Local<Context> context = isolate->GetCurrentContext();
+        Local<Object> robot = args[0]->ToObject(context).ToLocalChecked();
+        Local<Value> robotId = robot->Get(context, String::NewFromUtf8(isolate, "robot_id")).ToLocalChecked();
+        Local<Value> image = robot->Get(context, String::NewFromUtf8(isolate, "image")).ToLocalChecked();
+        
         // do stuff here
         // obj->value_ += 1;
 
