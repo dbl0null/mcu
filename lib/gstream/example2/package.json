@@ -1,0 +1,10 @@
+{
+  "name": "passing_wrapped",
+  "version": "0.0.0",
+  "description": "Node.js gstreams Example #8",
+  "main": "gstream.js",
+  "private": true,
+  "gypfile": true,
+  "dependencies": {
+  }
+}
