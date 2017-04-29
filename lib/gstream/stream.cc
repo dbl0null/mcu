@@ -19,7 +19,7 @@ namespace gstream {
 
     Persistent<Function> Stream::constructor;
 
-    Stream::Stream(double value) : value_(value) {
+    Stream::Stream() {
     }
 
     Stream::~Stream() {
@@ -39,22 +39,25 @@ namespace gstream {
     void Stream::New(const FunctionCallbackInfo<Value>& args) {
         std::cout << "Stream::New" << std::endl;
         Isolate* isolate = args.GetIsolate();
+        Local<Context> context = isolate->GetCurrentContext();
 
         if (args.IsConstructCall()) {
             std::cout << "Stream::New: new ()" << std::endl;
             // Invoked as constructor: `new Stream(...)`
-            double value = args[0]->IsUndefined() ? 0 : args[0]->NumberValue();
-            Stream* obj = new Stream(value);
-            obj->Wrap(args.This());
+            Local<Object> options = args[0]->ToObject(context).ToLocalChecked();
+            Local<Value> conferenceId = options->Get(context, String::NewFromUtf8(isolate, "conferenceId")).ToLocalChecked();
+            Local<Value> defaultView = options->Get(context, String::NewFromUtf8(isolate, "defaultView")).ToLocalChecked();
+            Stream* stream = new Stream();
+            stream->_conferenceId = *String::Utf8Value(conferenceId);
+            stream->_defaultView = *String::Utf8Value(defaultView);
+            // std::cout << stream->_conferenceId << std::endl;
+            stream->Wrap(args.This());
             args.GetReturnValue().Set(args.This());
         } else {
             std::cout << "Stream::New: ()" << std::endl;
             // Invoked as plain function `Stream(...)`, turn into construct call.
-            const int argc = 1;
-            Local<Value> argv[argc] = { args[0] };
             Local<Function> cons = Local<Function>::New(isolate, constructor);
-            Local<Context> context = isolate->GetCurrentContext();
-            Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
+            Local<Object> instance = cons->NewInstance(context).ToLocalChecked();
             args.GetReturnValue().Set(instance);
         }
     }
@@ -62,10 +65,11 @@ namespace gstream {
     void Stream::NewInstance(const FunctionCallbackInfo<Value>& args) {
         std::cout << "Stream::NewInstance" << std::endl;
         Isolate* isolate = args.GetIsolate();
-        const unsigned argc = 1;
-        Local<Value> argv[argc] = { args[0] };
         Local<Function> cons = Local<Function>::New(isolate, constructor);
         Local<Context> context = isolate->GetCurrentContext();
+
+        const unsigned argc = 1;
+        Local<Value> argv[argc] = { args[0] };
         Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
         args.GetReturnValue().Set(instance);
     }
@@ -73,7 +77,7 @@ namespace gstream {
     void Stream::AddRobot(const FunctionCallbackInfo<Value>& args) {
         std::cout << "Stream::AddRobot" << std::endl;
         Isolate* isolate = args.GetIsolate();
-        Stream* obj = ObjectWrap::Unwrap<Stream>(args.Holder());
+        Stream* stream = ObjectWrap::Unwrap<Stream>(args.Holder());
         Local<Function> cb = Local<Function>::Cast(args[1]);
 
         if(args.Length() != 2) {
@@ -88,6 +92,7 @@ namespace gstream {
         }
 
         // do stuff here
+        // obj->value_ += 1;
 
         // callback results
         Local<Value> err = v8::Null(isolate);
