@@ -15,7 +15,7 @@ namespace gstream {
          explicit Stream(double value = 0);
          ~Stream();
          static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
-         static void PlusOne(const v8::FunctionCallbackInfo<v8::Value>& args);
+         static void AddRobot(const v8::FunctionCallbackInfo<v8::Value>& args);
          static v8::Persistent<v8::Function> constructor;
          double value_;
     };

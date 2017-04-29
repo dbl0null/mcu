@@ -15,6 +15,7 @@ namespace gstream {
     using v8::Persistent;
     using v8::String;
     using v8::Value;
+    using v8::Exception;
 
     Persistent<Function> Stream::constructor;
 
@@ -30,7 +31,7 @@ namespace gstream {
         tpl->SetClassName(String::NewFromUtf8(isolate, "Stream"));
         tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-        NODE_SET_PROTOTYPE_METHOD(tpl, "plusOne", PlusOne);
+        NODE_SET_PROTOTYPE_METHOD(tpl, "addRobot", AddRobot);
 
         constructor.Reset(isolate, tpl->GetFunction());
     }
@@ -40,12 +41,14 @@ namespace gstream {
         Isolate* isolate = args.GetIsolate();
 
         if (args.IsConstructCall()) {
+            std::cout << "Stream::New: new ()" << std::endl;
             // Invoked as constructor: `new Stream(...)`
             double value = args[0]->IsUndefined() ? 0 : args[0]->NumberValue();
             Stream* obj = new Stream(value);
             obj->Wrap(args.This());
             args.GetReturnValue().Set(args.This());
         } else {
+            std::cout << "Stream::New: ()" << std::endl;
             // Invoked as plain function `Stream(...)`, turn into construct call.
             const int argc = 1;
             Local<Value> argv[argc] = { args[0] };
@@ -67,13 +70,30 @@ namespace gstream {
         args.GetReturnValue().Set(instance);
     }
 
-    void Stream::PlusOne(const FunctionCallbackInfo<Value>& args) {
+    void Stream::AddRobot(const FunctionCallbackInfo<Value>& args) {
+        std::cout << "Stream::AddRobot" << std::endl;
         Isolate* isolate = args.GetIsolate();
-
         Stream* obj = ObjectWrap::Unwrap<Stream>(args.Holder());
-        obj->value_ += 1;
+        Local<Function> cb = Local<Function>::Cast(args[1]);
 
-        args.GetReturnValue().Set(Number::New(isolate, obj->value_));
+        if(args.Length() != 2) {
+            Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: 2 parameters expected")) };
+            cb->Call(Null(isolate), 1, argv);
+            return;
+        }
+        if(!args[0]->IsObject()) {
+            Local<Value> argv[1] = { Exception::TypeError(String::NewFromUtf8(isolate, "Error: First parameter must be an object for options")) };
+            cb->Call(Null(isolate), 1, argv);
+            return;
+        }
+
+        // do stuff here
+
+        // callback results
+        Local<Value> err = v8::Null(isolate);
+        Local<Value> value = Number::New(isolate, 10);
+        Local<Value> argv[2] = { err, value };
+        cb->Call(Null(isolate), 2, argv);
     }
 
 }
