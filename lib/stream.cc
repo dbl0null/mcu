@@ -85,8 +85,10 @@ namespace gstream {
         Local<Value> robotId = robot->Get(context, String::NewFromUtf8(isolate, "robot_id")).ToLocalChecked();
         Local<Value> image = robot->Get(context, String::NewFromUtf8(isolate, "image")).ToLocalChecked();
 
-        // do stuff here
-        // obj->value_ += 1;
+        // ensure pipleline
+        if(!EnsurePipeline(stream)){
+            std::cout << "Stream::AddRobot::EnsurePipeline failed" << std::endl;
+        }
 
         // callback results
         Local<Value> err = v8::Null(isolate);
@@ -95,16 +97,18 @@ namespace gstream {
         cb->Call(Null(isolate), 2, argv);
     }
 
-    // bool EnsurePipeline(){
-    //     if(!_robotStreamData.pipeline){
-    //         gst_init ();
-    //         _robotStreamData.pipeline = gst_pipeline_new (stream->_conferenceId);
-    //         if (_robotStreamData.pipeline) {
-    //             return true;
-    //         } else {
-    //             g_printerr ("could not create pipeline.\n");
-    //             return false;
-    //         }
-    //     }
-    // }
+    bool EnsurePipeline(Stream* stream){
+        if(stream->robotStreamData.Pipeline){
+            return true;
+        }else{
+            gst_init(NULL, NULL);
+            stream->robotStreamData.Pipeline = gst_pipeline_new(stream->robotStreamData.ConferenceId.c_str());
+            if (stream->robotStreamData.Pipeline) {
+                return true;
+            } else {
+                g_printerr ("could not create pipeline.\n");
+                return false;
+            }
+        }
+    }
 }

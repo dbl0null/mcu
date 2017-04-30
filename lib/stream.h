@@ -12,13 +12,14 @@ namespace gstream {
         public:
             static void Init(v8::Isolate* isolate);
             static void NewInstance(const v8::FunctionCallbackInfo<v8::Value>& args);
+            static bool EnsurePipeline(Stream* stream);
+            RobotStreamData robotStreamData;
         private:
          explicit Stream();
          ~Stream();
          static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
          static void AddRobot(const v8::FunctionCallbackInfo<v8::Value>& args);
          static v8::Persistent<v8::Function> constructor;
-         RobotStreamData robotStreamData;
     };
 
 }
