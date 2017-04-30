@@ -1,6 +1,7 @@
 #include <iostream>
 #include <node.h>
 #include "stream.h"
+#include "streamdata.h"
 
 namespace gstream {
 
@@ -48,8 +49,8 @@ namespace gstream {
             Local<Value> conferenceId = options->Get(context, String::NewFromUtf8(isolate, "conferenceId")).ToLocalChecked();
             Local<Value> defaultView = options->Get(context, String::NewFromUtf8(isolate, "defaultView")).ToLocalChecked();
             Stream* stream = new Stream();
-            stream->_conferenceId = *String::Utf8Value(conferenceId);
-            stream->_defaultView = *String::Utf8Value(defaultView);
+            stream->robotStreamData.ConferenceId = *String::Utf8Value(conferenceId);
+            stream->robotStreamData.DefaultView = *String::Utf8Value(defaultView);
             // std::cout << stream->_conferenceId << std::endl;
             stream->Wrap(args.This());
             args.GetReturnValue().Set(args.This());
@@ -83,7 +84,7 @@ namespace gstream {
         Local<Object> robot = args[0]->ToObject(context).ToLocalChecked();
         Local<Value> robotId = robot->Get(context, String::NewFromUtf8(isolate, "robot_id")).ToLocalChecked();
         Local<Value> image = robot->Get(context, String::NewFromUtf8(isolate, "image")).ToLocalChecked();
-        
+
         // do stuff here
         // obj->value_ += 1;
 
@@ -94,4 +95,16 @@ namespace gstream {
         cb->Call(Null(isolate), 2, argv);
     }
 
+    // bool EnsurePipeline(){
+    //     if(!_robotStreamData.pipeline){
+    //         gst_init ();
+    //         _robotStreamData.pipeline = gst_pipeline_new (stream->_conferenceId);
+    //         if (_robotStreamData.pipeline) {
+    //             return true;
+    //         } else {
+    //             g_printerr ("could not create pipeline.\n");
+    //             return false;
+    //         }
+    //     }
+    // }
 }

@@ -3,6 +3,8 @@
 
 #include <node.h>
 #include <node_object_wrap.h>
+#include <gst/gst.h>
+#include "streamdata.h"
 
 namespace gstream {
 
@@ -16,8 +18,7 @@ namespace gstream {
          static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
          static void AddRobot(const v8::FunctionCallbackInfo<v8::Value>& args);
          static v8::Persistent<v8::Function> constructor;
-         std::string _conferenceId;
-         std::string _defaultView;
+         RobotStreamData robotStreamData;
     };
 
 }
