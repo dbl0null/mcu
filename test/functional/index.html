@@ -8,6 +8,7 @@
         .preview {
             width: 200px;
         }
+
         .remotevideo {
             width: 100%;
             height: 100%;
@@ -89,17 +90,18 @@
                 return connection.setLocalDescription(offer).then(function() {
                     return delayForIce(connection).then(function() {
                         console.log('got all ice candidates');
-                        // return $http({
-                        //     method: 'POST',
-                        //     url: '/offer',
-                        //     data: {
-                        //         participant_id: $rootScope.participant_id,
-                        //         offer: offer
-                        //     }
-                        // }).then(function () {
-                        //     console.log('offer sent:', offer);
-                        //     $scope.connecting = false;
-                        // });
+                        $.ajax({
+                            type: 'POST',
+                            url: '/join',
+                            data: JSON.stringify({
+                                conference_id: 'conference123',
+                                participant_id: 'participant123',
+                                offer: offer
+                            }),
+                            success: function(data) {
+                                console.log('got answer:', data);
+                            }
+                        });
                     });
                 });
             });
