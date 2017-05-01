@@ -1,0 +1,8 @@
+a=candidate:1467250027 1 udp 2122260223 192.168.0.196 56143 typ host generation 0
+a=candidate:1467250027 2 udp 2122260222 192.168.0.196 58874 typ host generation 0
+a=candidate:435653019 1 tcp 1518280447 192.168.0.196 0 typ host tcptype active generation 0
+a=candidate:435653019 2 tcp 1518280446 192.168.0.196 0 typ host tcptype active generation 0
+a=candidate:1853887674 1 udp 1518280447 47.61.61.61 36768 typ srflx raddr 192.168.0.196 rport 36768 generation 0
+a=candidate:1853887674 1 udp 1518280447 47.61.61.61 36768 typ srflx raddr 192.168.0.196 rport 36768 generation 0
+a=candidate:750991856 1 udp 25108223 237.30.30.30 60372 typ relay raddr 47.61.61.61 rport 54765 generation 0
+a=candidate:750991856 2 udp 25108222 237.30.30.30 64891 typ relay raddr 47.61.61.61 rport 54767 generation 0
