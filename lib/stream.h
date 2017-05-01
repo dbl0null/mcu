@@ -18,8 +18,6 @@ namespace gstream {
             explicit Stream();
             ~Stream();
             static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
-            static bool EnsurePipeline(Stream* stream);
-            static bool SetupRobot(Stream* stream, std::string image);
             static v8::Persistent<v8::Function> constructor;
     };
 

@@ -85,13 +85,37 @@ namespace gstream {
         // Local<Value> robotId = robot->Get(context, String::NewFromUtf8(isolate, "robot_id")).ToLocalChecked();
         Local<Value> image = robot->Get(context, String::NewFromUtf8(isolate, "image")).ToLocalChecked();
 
-        if(!EnsurePipeline(stream)){
-            std::cout << "Stream::AddRobot::EnsurePipeline failed" << std::endl;
+        // ensure Pipeline
+        if(!stream->robotStreamData.Pipeline){
+            gst_init(NULL, NULL);
+            stream->robotStreamData.Pipeline = gst_pipeline_new(stream->robotStreamData.ConferenceId.c_str());
+            if (!stream->robotStreamData.Pipeline) {
+                std::cout << "Stream::AddRobot::EnsurePipeline failed" << std::endl;
+            }
         }
 
-        if(!SetupRobot(stream, *String::Utf8Value(image))){
-            std::cout << "Stream::AddRobot::SetupRobot failed" << std::endl;
-        }
+        // creating elements
+        GstElement *pipeline = stream->robotStreamData.Pipeline;
+        stream->robotStreamData.ImageSource = gst_element_factory_make("multifilesrc", "imagesource");
+        gst_bin_add(GST_BIN(pipeline), stream->robotStreamData.ImageSource);
+
+        stream->robotStreamData.JpegDec = gst_element_factory_make("jpegdec", "decoder");
+        gst_bin_add(GST_BIN(pipeline), stream->robotStreamData.JpegDec);
+
+        stream->robotStreamData.VideoConvert  = gst_element_factory_make("videoconvert", "videoconvert");
+        gst_bin_add(GST_BIN(pipeline), stream->robotStreamData.VideoConvert);
+
+        stream->robotStreamData.AutoVideoSink = gst_element_factory_make("autovideosink", "videosink");
+        gst_bin_add(GST_BIN(pipeline), stream->robotStreamData.AutoVideoSink);
+
+        // linking elements
+        gst_element_link(stream->robotStreamData.ImageSource, stream->robotStreamData.JpegDec);
+        gst_element_link(stream->robotStreamData.JpegDec, stream->robotStreamData.VideoConvert);
+        gst_element_link(stream->robotStreamData.VideoConvert, stream->robotStreamData.AutoVideoSink);
+
+        // setup robot images
+        std::string imglocation = *String::Utf8Value(image);
+        g_object_set(G_OBJECT(stream->robotStreamData.ImageSource), "location", imglocation.c_str(), NULL);
 
         // play robot video
         GstStateChangeReturn ret = gst_element_set_state (stream->robotStreamData.Pipeline, GST_STATE_PLAYING);
@@ -103,75 +127,5 @@ namespace gstream {
         Local<Value> err = v8::Null(isolate);
         Local<Value> argv[1] = { err };
         cb->Call(Null(isolate), 1, argv);
-    }
-
-    bool EnsurePipeline(Stream* stream){
-        if(stream->robotStreamData.Pipeline){
-            return true;
-        }else{
-            gst_init(NULL, NULL);
-            stream->robotStreamData.Pipeline = gst_pipeline_new(stream->robotStreamData.ConferenceId.c_str());
-            if (stream->robotStreamData.Pipeline) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    bool SetupRobot(Stream* stream, std::string image){
-        GstElement *pipeline = stream->robotStreamData.Pipeline;
-
-
-        // creating elements
-        stream->robotStreamData.ImageSource = gst_element_factory_make("multifilesrc", "imagesource");
-        if (!stream->robotStreamData.ImageSource) {
-            return false;
-        }
-        if(!gst_bin_add(GST_BIN(pipeline), stream->robotStreamData.ImageSource)){
-            return false;
-        }
-
-        stream->robotStreamData.JpegDec = gst_element_factory_make("jpegdec", "decoder");
-        if (!stream->robotStreamData.JpegDec) {
-            return false;
-        }
-        if(!gst_bin_add(GST_BIN(pipeline), stream->robotStreamData.JpegDec)){
-            return false;
-        }
-
-        stream->robotStreamData.VideoConvert  = gst_element_factory_make("videoconvert", "videoconvert");
-        if (!stream->robotStreamData.VideoConvert) {
-            return false;
-        }
-        if(!gst_bin_add(GST_BIN(pipeline), stream->robotStreamData.VideoConvert)){
-            return false;
-        }
-
-        stream->robotStreamData.AutoVideoSink = gst_element_factory_make("autovideosink", "videosink");
-        if (!stream->robotStreamData.AutoVideoSink) {
-            return false;
-        }
-        if(!gst_bin_add(GST_BIN(pipeline), stream->robotStreamData.AutoVideoSink)){
-            return false;
-        }
-
-        // linking elements
-        if(!gst_element_link(stream->robotStreamData.ImageSource, stream->robotStreamData.JpegDec)){
-            return false;
-        }
-
-        if(!gst_element_link(stream->robotStreamData.JpegDec, stream->robotStreamData.VideoConvert)){
-            return false;
-        }
-
-        if(!gst_element_link(stream->robotStreamData.VideoConvert, stream->robotStreamData.AutoVideoSink)){
-            return false;
-        }
-
-        // setup robot image
-        g_object_set(G_OBJECT(stream->robotStreamData.ImageSource), "location", image.c_str(), NULL);
-
-        return true;
     }
 }
