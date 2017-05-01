@@ -1,0 +1,120 @@
+<html>
+
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/6.0.0/normalize.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <style>
+        .preview {
+            width: 200px;
+        }
+        .remotevideo {
+            width: 100%;
+            height: 100%;
+        }
+        </style>
+    </head>
+
+    <body>
+        <video id="preview" class="preview" autoplay="autoplay" muted="true"></video>
+        <video id="remotevideo" class="remotevideo" autoplay="autoplay"></video>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.min.js"></script>
+        <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/bluebird/3.5.0/bluebird.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.11/ngStorage.min.js"></script>
+        <script src="http://localhost:3001/livereload.js"></script>
+        <script>
+        var connection = new RTCPeerConnection();
+        var localIceCandidates = {};
+        connection.onicecandidate = function(evt) {
+            if (evt.candidate) {
+                var hash = CryptoJS.MD5(evt.candidate.candidate).toString();
+                if (!localIceCandidates[hash]) {
+                    console.log('got ice candidate', evt.candidate);
+                    localIceCandidates[hash] = evt.candidate;
+                }
+            }
+        };
+        connection.oniceconnectionstatechange = function(evt) {
+            console.log('oniceconnectionstatechange', evt.target.iceConnectionState);
+        };
+        connection.onaddstream = function(evt) {
+            console.log('onaddstream...', evt);
+            var streams = connection.getRemoteStreams();
+            for (var stream of streams) {
+                console.log('showing remote stream: ' + stream.id);
+                document.getElementById('remotevideo').srcObject = stream;
+            }
+        };
+
+        delayForIce = function(connection) {
+            if (connection.iceGatheringState !== 'complete') {
+                return Promise.delay(500).then(function() {
+                    console.log('delayForIce waiting...');
+                    return delayForIce(connection);
+                });
+            } else {
+                console.log('delayForIce done');
+                return Promise.resolve();
+            }
+        };
+
+        navigator.mediaDevices.getUserMedia({
+            audio: {
+                audio: true
+            },
+            video: {
+                width: {
+                    ideal: 1280
+                },
+                height: {
+                    ideal: 720
+                },
+                frameRate: {
+                    ideal: 60
+                }
+            }
+        }).then(function(stream) {
+            console.log('got local stream');
+            connection.addStream(stream);
+            document.getElementById('preview').srcObject = stream;
+            return connection.createOffer().then(function(offer) {
+                console.log('offer created:', offer);
+                return connection.setLocalDescription(offer).then(function() {
+                    return delayForIce(connection).then(function() {
+                        console.log('got all ice candidates');
+                        // return $http({
+                        //     method: 'POST',
+                        //     url: '/offer',
+                        //     data: {
+                        //         participant_id: $rootScope.participant_id,
+                        //         offer: offer
+                        //     }
+                        // }).then(function () {
+                        //     console.log('offer sent:', offer);
+                        //     $scope.connecting = false;
+                        // });
+                    });
+                });
+            });
+        });
+
+        // connection.setRemoteDescription(desc).then(function () {
+        //
+        // });
+        //
+        // connection.addIceCandidate(data).then(function () {
+        //     console.log('sucessfully added remote ice candidate', data);
+        // }).catch(function () {
+        //     console.warn('could not add remote ice candidate', data);
+        // });
+        </script>
+    </body>
+
+</html>
