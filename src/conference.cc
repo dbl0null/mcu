@@ -174,6 +174,7 @@ namespace mcu {
         EnsurePipeline(conference);
         EnsureElements(conference);
 
+
         // // creating elements
         // GstElement *pipeline = conference->conferenceData.Pipeline;
         // conference->conferenceData.ImageSource = gst_element_factory_make("multifilesrc", "imagesource");
