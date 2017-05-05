@@ -23,5 +23,4 @@ namespace mcu {
     }
 
     NODE_MODULE(mcu, InitAll)
-
 }
