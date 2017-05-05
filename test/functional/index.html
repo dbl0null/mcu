@@ -87,16 +87,23 @@
             document.getElementById('preview').srcObject = stream;
             return connection.createOffer().then(function(offer) {
                 console.log('offer created:', offer);
+                console.log(offer.sdp);
                 return connection.setLocalDescription(offer).then(function() {
                     return delayForIce(connection).then(function() {
                         console.log('got all ice candidates');
+                        var iceCandidates = [];
+                        _.forOwn(localIceCandidates, function(value, key) {
+                            iceCandidates.push(value);
+                        });
                         $.ajax({
                             type: 'POST',
                             url: '/join',
+                            contentType: 'application/json',
                             data: JSON.stringify({
                                 conference_id: 'conference123',
                                 participant_id: 'participant123',
-                                offer: offer
+                                offer: offer,
+                                iceCandidates: iceCandidates
                             }),
                             success: function(data) {
                                 console.log('got answer:', data);

@@ -27,7 +27,10 @@ app.post('/join', function (req, res) {
     var participant = new mcu.WebRTCParticipant({
         participant_id: req.body.participant_id,
         offer: req.body.offer,
+        iceCandidates: req.body.iceCandidates
     });
+
+    console.log('join participant', participant);
 
     participant.join(conference).then((answer) => {
         console.log('join with answer.', answer);
