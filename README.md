@@ -48,3 +48,10 @@ participant.join(conference).then((answer) => {
 # Goals
 Single RTCPeerConnection with mcu for group calls
 Robot participants for automated interactions
+
+# Development
+
+```
+sudo npm install -g gulp node-gyp
+node-gyp configure build
+```

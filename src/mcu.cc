@@ -12,12 +12,12 @@ namespace mcu {
     using v8::Value;
 
     void CreateConference(const FunctionCallbackInfo<Value>& args) {
-        std::cout << "CreateConference" << std::endl;
+        std::cout << "Mcu::CreateConference" << std::endl;
         Conference::NewInstance(args);
     }
 
     void InitAll(Local<Object> exports, Local<Object> module) {
-        std::cout << "Init" << std::endl;
+        std::cout << "Mcu::InitAll" << std::endl;
         Conference::Init(exports->GetIsolate());
         NODE_SET_METHOD(module, "exports", CreateConference);
     }

@@ -33,6 +33,7 @@ namespace mcu {
         tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
         NODE_SET_PROTOTYPE_METHOD(tpl, "addRobot", AddRobot);
+        NODE_SET_PROTOTYPE_METHOD(tpl, "addWebRTCParticipant", AddWebRTCParticipant);
 
         constructor.Reset(isolate, tpl->GetFunction());
     }
@@ -49,8 +50,8 @@ namespace mcu {
             Local<Value> conferenceId = options->Get(context, String::NewFromUtf8(isolate, "conferenceId")).ToLocalChecked();
             Local<Value> defaultView = options->Get(context, String::NewFromUtf8(isolate, "defaultView")).ToLocalChecked();
             Conference* conference = new Conference();
-            conference->robotConferenceData.ConferenceId = *String::Utf8Value(conferenceId);
-            conference->robotConferenceData.DefaultView = *String::Utf8Value(defaultView);
+            conference->conferenceData.ConferenceId = *String::Utf8Value(conferenceId);
+            conference->conferenceData.DefaultView = *String::Utf8Value(defaultView);
             // std::cout << conference->_conferenceId << std::endl;
             conference->Wrap(args.This());
             args.GetReturnValue().Set(args.This());
@@ -75,53 +76,132 @@ namespace mcu {
         args.GetReturnValue().Set(instance);
     }
 
+    void Conference::EnsurePipeline(Conference *conference) {
+      std::cout << "Conference::EnsurePipeline" << std::endl;
+      if(!conference->conferenceData.Pipeline){
+          gst_init(NULL, NULL);
+          conference->conferenceData.Pipeline = gst_pipeline_new(conference->conferenceData.ConferenceId.c_str());
+          if (!conference->conferenceData.Pipeline) {
+              std::cout << "Conference::AddRobot::EnsurePipeline failed" << std::endl;
+          }
+      }
+    }
+
+    void Conference::EnsureElements(Conference *conference) {
+        std::cout << "Conference::EnsureElements" << std::endl;
+        GstElement *pipeline = conference->conferenceData.Pipeline;
+
+        if(!conference->conferenceData.VideoMixer){
+            std::cout << "Conference::EnsureElements::Adding VideoMixer to pipeline" << std::endl;
+            conference->conferenceData.VideoMixer = gst_element_factory_make("videomixer", "videomixer");
+            gst_bin_add(GST_BIN(pipeline), conference->conferenceData.VideoMixer);
+        }
+
+        if(!conference->conferenceData.AudioMixer){
+            std::cout << "Conference::EnsureElements::Adding AudioMixer to pipeline" << std::endl;
+            conference->conferenceData.AudioMixer = gst_element_factory_make("audiomixer", "audiomixer");
+            gst_bin_add(GST_BIN(pipeline), conference->conferenceData.AudioMixer);
+        }
+    }
+
     void Conference::AddRobot(const FunctionCallbackInfo<Value>& args) {
         std::cout << "Conference::AddRobot" << std::endl;
         Isolate* isolate = args.GetIsolate();
+        // Conference* conference = ObjectWrap::Unwrap<Conference>(args.Holder());
+        Local<Function> cb = Local<Function>::Cast(args[1]);
+        // Local<Context> context = isolate->GetCurrentContext();
+        // Local<Object> robot = args[0]->ToObject(context).ToLocalChecked();
+        // // Local<Value> robotId = robot->Get(context, String::NewFromUtf8(isolate, "robot_id")).ToLocalChecked();
+        // Local<Value> image = robot->Get(context, String::NewFromUtf8(isolate, "image")).ToLocalChecked();
+
+        // // ensure Pipeline
+        // if(!conference->conferenceData.Pipeline){
+        //     gst_init(NULL, NULL);
+        //     conference->conferenceData.Pipeline = gst_pipeline_new(conference->conferenceData.ConferenceId.c_str());
+        //     if (!conference->conferenceData.Pipeline) {
+        //         std::cout << "Conference::AddRobot::EnsurePipeline failed" << std::endl;
+        //     }
+        // }
+        //
+        // // creating elements
+        // GstElement *pipeline = conference->conferenceData.Pipeline;
+        // conference->conferenceData.ImageSource = gst_element_factory_make("multifilesrc", "imagesource");
+        // gst_bin_add(GST_BIN(pipeline), conference->conferenceData.ImageSource);
+        //
+        // conference->conferenceData.JpegDec = gst_element_factory_make("jpegdec", "decoder");
+        // gst_bin_add(GST_BIN(pipeline), conference->conferenceData.JpegDec);
+        //
+        // conference->conferenceData.VideoConvert  = gst_element_factory_make("videoconvert", "videoconvert");
+        // gst_bin_add(GST_BIN(pipeline), conference->conferenceData.VideoConvert);
+        //
+        // conference->conferenceData.AutoVideoSink = gst_element_factory_make("autovideosink", "videosink");
+        // gst_bin_add(GST_BIN(pipeline), conference->conferenceData.AutoVideoSink);
+        //
+        // // linking elements
+        // gst_element_link(conference->conferenceData.ImageSource, conference->conferenceData.JpegDec);
+        // gst_element_link(conference->conferenceData.JpegDec, conference->conferenceData.VideoConvert);
+        // gst_element_link(conference->conferenceData.VideoConvert, conference->conferenceData.AutoVideoSink);
+        //
+        // // setup robot images
+        // std::string imglocation = *String::Utf8Value(image);
+        // g_object_set(G_OBJECT(conference->conferenceData.ImageSource), "location", imglocation.c_str(), NULL);
+        //
+        // // play robot video
+        // GstStateChangeReturn ret = gst_element_set_state (conference->conferenceData.Pipeline, GST_STATE_PLAYING);
+        // if (ret == GST_STATE_CHANGE_FAILURE) {
+        //     std::cout << "Conference::AddRobot::PlayPipeline failed" << std::endl;
+        // }
+
+        // callback results
+        Local<Value> err = v8::Null(isolate);
+        Local<Value> argv[1] = { err };
+        cb->Call(Null(isolate), 1, argv);
+    }
+
+    void Conference::AddWebRTCParticipant(const FunctionCallbackInfo<Value>& args) {
+        std::cout << "Conference::AddWebRTCParticipant" << std::endl;
+        Isolate* isolate = args.GetIsolate();
+
+        // Unwrap conference option from node
         Conference* conference = ObjectWrap::Unwrap<Conference>(args.Holder());
+
+        // get node options for addWebRTCParticipant
         Local<Function> cb = Local<Function>::Cast(args[1]);
         Local<Context> context = isolate->GetCurrentContext();
-        Local<Object> robot = args[0]->ToObject(context).ToLocalChecked();
-        // Local<Value> robotId = robot->Get(context, String::NewFromUtf8(isolate, "robot_id")).ToLocalChecked();
-        Local<Value> image = robot->Get(context, String::NewFromUtf8(isolate, "image")).ToLocalChecked();
+        Local<Object> participant = args[0]->ToObject(context).ToLocalChecked();
+        Local<Value> participantId = participant->Get(context, String::NewFromUtf8(isolate, "participant_id")).ToLocalChecked();
 
-        // ensure Pipeline
-        if(!conference->robotConferenceData.Pipeline){
-            gst_init(NULL, NULL);
-            conference->robotConferenceData.Pipeline = gst_pipeline_new(conference->robotConferenceData.ConferenceId.c_str());
-            if (!conference->robotConferenceData.Pipeline) {
-                std::cout << "Conference::AddRobot::EnsurePipeline failed" << std::endl;
-            }
-        }
+        EnsurePipeline(conference);
+        EnsureElements(conference);
 
-        // creating elements
-        GstElement *pipeline = conference->robotConferenceData.Pipeline;
-        conference->robotConferenceData.ImageSource = gst_element_factory_make("multifilesrc", "imagesource");
-        gst_bin_add(GST_BIN(pipeline), conference->robotConferenceData.ImageSource);
-
-        conference->robotConferenceData.JpegDec = gst_element_factory_make("jpegdec", "decoder");
-        gst_bin_add(GST_BIN(pipeline), conference->robotConferenceData.JpegDec);
-
-        conference->robotConferenceData.VideoConvert  = gst_element_factory_make("videoconvert", "videoconvert");
-        gst_bin_add(GST_BIN(pipeline), conference->robotConferenceData.VideoConvert);
-
-        conference->robotConferenceData.AutoVideoSink = gst_element_factory_make("autovideosink", "videosink");
-        gst_bin_add(GST_BIN(pipeline), conference->robotConferenceData.AutoVideoSink);
-
-        // linking elements
-        gst_element_link(conference->robotConferenceData.ImageSource, conference->robotConferenceData.JpegDec);
-        gst_element_link(conference->robotConferenceData.JpegDec, conference->robotConferenceData.VideoConvert);
-        gst_element_link(conference->robotConferenceData.VideoConvert, conference->robotConferenceData.AutoVideoSink);
-
-        // setup robot images
-        std::string imglocation = *String::Utf8Value(image);
-        g_object_set(G_OBJECT(conference->robotConferenceData.ImageSource), "location", imglocation.c_str(), NULL);
-
-        // play robot video
-        GstStateChangeReturn ret = gst_element_set_state (conference->robotConferenceData.Pipeline, GST_STATE_PLAYING);
-        if (ret == GST_STATE_CHANGE_FAILURE) {
-            std::cout << "Conference::AddRobot::PlayPipeline failed" << std::endl;
-        }
+        // // creating elements
+        // GstElement *pipeline = conference->conferenceData.Pipeline;
+        // conference->conferenceData.ImageSource = gst_element_factory_make("multifilesrc", "imagesource");
+        // gst_bin_add(GST_BIN(pipeline), conference->conferenceData.ImageSource);
+        //
+        // conference->conferenceData.JpegDec = gst_element_factory_make("jpegdec", "decoder");
+        // gst_bin_add(GST_BIN(pipeline), conference->conferenceData.JpegDec);
+        //
+        // conference->conferenceData.VideoConvert  = gst_element_factory_make("videoconvert", "videoconvert");
+        // gst_bin_add(GST_BIN(pipeline), conference->conferenceData.VideoConvert);
+        //
+        // conference->conferenceData.AutoVideoSink = gst_element_factory_make("autovideosink", "videosink");
+        // gst_bin_add(GST_BIN(pipeline), conference->conferenceData.AutoVideoSink);
+        //
+        // // linking elements
+        // gst_element_link(conference->conferenceData.ImageSource, conference->conferenceData.JpegDec);
+        // gst_element_link(conference->conferenceData.JpegDec, conference->conferenceData.VideoConvert);
+        // gst_element_link(conference->conferenceData.VideoConvert, conference->conferenceData.AutoVideoSink);
+        //
+        // // setup robot images
+        // std::string imglocation = *String::Utf8Value(image);
+        // g_object_set(G_OBJECT(conference->conferenceData.ImageSource), "location", imglocation.c_str(), NULL);
+        //
+        // // play robot video
+        // GstStateChangeReturn ret = gst_element_set_state (conference->conferenceData.Pipeline, GST_STATE_PLAYING);
+        // if (ret == GST_STATE_CHANGE_FAILURE) {
+        //     std::cout << "Conference::AddRobot::PlayPipeline failed" << std::endl;
+        // }
 
         // callback results
         Local<Value> err = v8::Null(isolate);

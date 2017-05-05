@@ -30,7 +30,7 @@ app.post('/join', function (req, res) {
         iceCandidates: req.body.iceCandidates
     });
 
-    console.log('join participant', participant);
+    // console.log('join participant', participant);
 
     participant.join(conference).then((answer) => {
         console.log('join with answer.', answer);

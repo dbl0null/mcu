@@ -5,27 +5,30 @@
 
 namespace mcu {
 
-    struct ConferenceData {
-        std::string ConferenceId;
-        std::string DefaultView;
-        GstElement *Pipeline;
-        GstBus *Bus;
-    };
-
     struct RobotData {
         std::string RobotId;
         GstElement *ImageSource;
         GstElement *JpegDec;
         GstElement *VideoConvert;
-        GstElement *AutoVideoSink;
     };
 
     struct WebRTCParticipantData {
         std::string ParticipantId;
-        GstElement *ImageSource;
+        GstElement *NiceSource;
         GstElement *JpegDec;
         GstElement *VideoConvert;
-        GstElement *AutoVideoSink;
+        GstElement *NiceSink;
+    };
+
+    struct ConferenceData {
+        std::string ConferenceId;
+        std::string DefaultView;
+        GstElement *Pipeline;
+        GstElement *VideoMixer;
+        GstElement *AudioMixer;
+        GstBus *Bus;
+        RobotData robots[1];
+        WebRTCParticipantData webRTCParticipants[10];
     };
 }
 

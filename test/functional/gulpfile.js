@@ -25,10 +25,14 @@ gulp.task('watch', ['server'], function () {
     livereload.listen({
         port: 3001
     });
-    gulp.watch(['server.js'], function () {
+    gulp.watch(['server.js'], {
+        interval: 200
+    }, function () {
         server();
     });
-    gulp.watch(['*.html'], function () {
+    gulp.watch(['*.html'], {
+        interval: 200
+    }, function () {
         livereload.reload();
     });
 });

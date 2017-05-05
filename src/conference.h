@@ -13,11 +13,14 @@ namespace mcu {
             static void Init(v8::Isolate* isolate);
             static void NewInstance(const v8::FunctionCallbackInfo<v8::Value>& args);
             static void AddRobot(const v8::FunctionCallbackInfo<v8::Value>& args);
-            RobotConferenceData robotConferenceData;
+            static void AddWebRTCParticipant(const v8::FunctionCallbackInfo<v8::Value>& args);
+            ConferenceData conferenceData;
         private:
             explicit Conference();
             ~Conference();
             static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
+            static void EnsurePipeline(Conference *conference);
+            static void EnsureElements(Conference *conference);
             static v8::Persistent<v8::Function> constructor;
     };
 
