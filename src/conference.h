@@ -4,19 +4,19 @@
 #include <node.h>
 #include <node_object_wrap.h>
 #include <gst/gst.h>
-#include "streamdata.h"
+#include "conferencedata.h"
 
-namespace gstream {
+namespace mcu {
 
-    class Stream : public node::ObjectWrap {
+    class Conference : public node::ObjectWrap {
         public:
             static void Init(v8::Isolate* isolate);
             static void NewInstance(const v8::FunctionCallbackInfo<v8::Value>& args);
             static void AddRobot(const v8::FunctionCallbackInfo<v8::Value>& args);
-            RobotStreamData robotStreamData;
+            RobotConferenceData robotConferenceData;
         private:
-            explicit Stream();
-            ~Stream();
+            explicit Conference();
+            ~Conference();
             static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
             static v8::Persistent<v8::Function> constructor;
     };

@@ -1,11 +1,11 @@
-#ifndef STREAMDATA_H
-#define STREAMDATA_H
+#ifndef CONFERENCEDATA_H
+#define CONFERENCEDATA_H
 
 #include <gst/gst.h>
 
-namespace gstream {
+namespace mcu {
 
-    struct RobotStreamData {
+    struct RobotConferenceData {
         std::string ConferenceId;
         std::string DefaultView;
         GstElement *Pipeline;

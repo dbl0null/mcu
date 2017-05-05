@@ -35,7 +35,7 @@ gulp.task('unit', function () {
 gulp.task('build', $.shell.task(['node-gyp build']));
 
 gulp.task('watch', function () {
-    gulp.watch(['**/*.js', '!node_modules/**/*'], {
+    gulp.watch(['src/*'], {
         interval: 500
     }, ['build']).on('change', function (file) {
         console.log(chalk.underline.bold.blue(file.path), 'changed');

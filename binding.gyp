@@ -1,8 +1,8 @@
 {
   "targets": [
     {
-      "target_name": "gstream",
-      "sources": [ "lib/gstream.cc", "lib/stream.cc" ],
+      "target_name": "mcu",
+      "sources": [ "src/mcu.cc", "src/conference.cc" ],
 	  "conditions" : [
 		["OS=='linux'", {
 			"include_dirs": [
