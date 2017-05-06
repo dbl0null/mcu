@@ -219,33 +219,33 @@ void Conference::AddWebRTCParticipant(const FunctionCallbackInfo<Value>& args) {
         g_signal_connect(G_OBJECT(niceAgentReceive), "component-state-changed", G_CALLBACK(cbComponentStateChanged), NULL);
         g_signal_connect(G_OBJECT(niceAgentSend), "component-state-changed", G_CALLBACK(cbComponentStateChanged), NULL);
 
-        nice_agent_set_remote_credentials(niceAgentReceive, niceAgentReceiveStream, iceUfrag, icePwd);
-        gchar *user = NULL;
-        gchar *passwd = NULL;
-        nice_agent_get_local_credentials(niceAgentSend, niceAgentSendStream, &user, &passwd);
-
-        nice_agent_gather_candidates(niceAgentReceive, niceAgentReceiveStream);
-        nice_agent_gather_candidates(niceAgentSend, niceAgentSendStream);
-
-        // Create gstreamer elements
-        GstElement *niceSink = gst_check_setup_element("nicesink");
-        GstElement *niceSource = gst_check_setup_element("nicesrc");
-        webRTCParticipant.NiceSink = niceSink;
-        webRTCParticipant.NiceSource = niceSource;
-        g_object_set (niceSink, "agent", niceAgentReceive, "stream", niceAgentReceiveStream, "component", 1, NULL);
-        g_object_set (niceSource, "agent", niceAgentSend, "stream", niceAgentSendStream, "component", 1, NULL);
-        GstStaticPadTemplate srctemplate = GST_STATIC_PAD_TEMPLATE ("src", GST_PAD_SRC, GST_PAD_ALWAYS, GST_STATIC_CAPS_ANY);
-        GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE ("src", GST_PAD_SINK, GST_PAD_ALWAYS, GST_STATIC_CAPS_ANY);
-        GstPad *sourcePad = gst_check_setup_src_pad_by_name (niceSink, &srctemplate, "sink");
-        GstPad *sinkPad = gst_check_setup_sink_pad_by_name (niceSource, &sinktemplate, "src");
-        webRTCParticipant.SourcePad = sourcePad;
-        webRTCParticipant.SinkPad = sinkPad;
-
-        gst_element_set_state (niceSink, GST_STATE_PLAYING);
-        gst_pad_set_active (sourcePad, TRUE);
-
-        gst_element_set_state (niceSource, GST_STATE_PLAYING);
-        gst_pad_set_active (sinkPad, TRUE);
+        nice_agent_set_remote_credentials(niceAgentReceive, niceAgentReceiveStream, iceUfrag.c_str(), icePwd.c_str());
+        // gchar *user = NULL;
+        // gchar *passwd = NULL;
+        // nice_agent_get_local_credentials(niceAgentSend, niceAgentSendStream, &user, &passwd);
+        //
+        // nice_agent_gather_candidates(niceAgentReceive, niceAgentReceiveStream);
+        // nice_agent_gather_candidates(niceAgentSend, niceAgentSendStream);
+        //
+        // // Create gstreamer elements
+        // GstElement *niceSink = gst_check_setup_element("nicesink");
+        // GstElement *niceSource = gst_check_setup_element("nicesrc");
+        // webRTCParticipant.NiceSink = niceSink;
+        // webRTCParticipant.NiceSource = niceSource;
+        // g_object_set (niceSink, "agent", niceAgentReceive, "stream", niceAgentReceiveStream, "component", 1, NULL);
+        // g_object_set (niceSource, "agent", niceAgentSend, "stream", niceAgentSendStream, "component", 1, NULL);
+        // GstStaticPadTemplate srctemplate = GST_STATIC_PAD_TEMPLATE ("src", GST_PAD_SRC, GST_PAD_ALWAYS, GST_STATIC_CAPS_ANY);
+        // GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE ("src", GST_PAD_SINK, GST_PAD_ALWAYS, GST_STATIC_CAPS_ANY);
+        // GstPad *sourcePad = gst_check_setup_src_pad_by_name (niceSink, &srctemplate, "sink");
+        // GstPad *sinkPad = gst_check_setup_sink_pad_by_name (niceSource, &sinktemplate, "src");
+        // webRTCParticipant.SourcePad = sourcePad;
+        // webRTCParticipant.SinkPad = sinkPad;
+        //
+        // gst_element_set_state (niceSink, GST_STATE_PLAYING);
+        // gst_pad_set_active (sourcePad, TRUE);
+        //
+        // gst_element_set_state (niceSource, GST_STATE_PLAYING);
+        // gst_pad_set_active (sinkPad, TRUE);
 
         // cleanup
         // gst_check_teardown_pad_by_name (niceSink, "sink");
