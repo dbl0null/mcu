@@ -2,6 +2,7 @@
 #define CONFERENCEDATA_H
 
 #include <gst/gst.h>
+#include <nice/agent.h>
 
 namespace mcu {
 

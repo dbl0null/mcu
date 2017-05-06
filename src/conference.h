@@ -4,6 +4,7 @@
 #include <node.h>
 #include <node_object_wrap.h>
 #include <gst/gst.h>
+#include <nice/agent.h>
 #include "conferencedata.h"
 
 namespace mcu {
@@ -23,6 +24,7 @@ static void EnsurePipeline(Conference *conference);
 static void EnsureElements(Conference *conference);
 static void cbCandidateGatheringDone(NiceAgent * agent, guint stream_id, gpointer data);
 static void cbComponentStateChanged(NiceAgent * agent, guint stream_id, guint component_id, guint state, gpointer user_data);
+static WebRTCParticipantData EnsureWebRTCParticipant(Conference *conference, std::string participantId);
 static v8::Persistent<v8::Function> constructor;
 };
 

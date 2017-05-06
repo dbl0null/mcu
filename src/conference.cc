@@ -159,15 +159,28 @@ void Conference::AddRobot(const FunctionCallbackInfo<Value>& args) {
         cb->Call(Null(isolate), 1, argv);
 }
 
-static GstStaticPadTemplate srctemplate = GST_STATIC_PAD_TEMPLATE ("src",
-                                                                   GST_PAD_SRC,
-                                                                   GST_PAD_ALWAYS,
-                                                                   GST_STATIC_CAPS_ANY);
+WebRTCParticipantData Conference::EnsureWebRTCParticipant(Conference *conference, std::string participantId) {
+        std::cout << "Conference::EnsurePipeline" << std::endl;
+        int n = sizeof(conference->conferenceData.webRTCParticipants)/sizeof(conference->conferenceData.webRTCParticipants[0]);
+        struct WebRTCParticipantData webRTCParticipantData;
 
-static GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE ("src",
-                                                                    GST_PAD_SINK,
-                                                                    GST_PAD_ALWAYS,
-                                                                    GST_STATIC_CAPS_ANY);
+        for(int i = 0; i < n; i++) {
+                if(conference->conferenceData.webRTCParticipants[i].ParticipantId == participantId) {
+                        // found existing participant
+                        webRTCParticipantData = conference->conferenceData.webRTCParticipants[i];
+                        return webRTCParticipantData;
+                }
+        }
+        for(int i = 0; i < n; i++) {
+                if(conference->conferenceData.webRTCParticipants[i].ParticipantId == "") {
+                        // create new participant
+                        webRTCParticipantData.ParticipantId = participantId;
+                        conference->conferenceData.webRTCParticipants[i] = webRTCParticipantData;
+
+                }
+        }
+        return webRTCParticipantData;
+}
 
 void Conference::AddWebRTCParticipant(const FunctionCallbackInfo<Value>& args) {
         std::cout << "Conference::AddWebRTCParticipant" << std::endl;
@@ -180,18 +193,19 @@ void Conference::AddWebRTCParticipant(const FunctionCallbackInfo<Value>& args) {
         Local<Function> cb = Local<Function>::Cast(args[1]);
         Local<Context> context = isolate->GetCurrentContext();
         Local<Object> participant = args[0]->ToObject(context).ToLocalChecked();
-        Local<Value> participantId = participant->Get(context, String::NewFromUtf8(isolate, "participant_id")).ToLocalChecked();
-        Local<Value> iceUfrag = participant->Get(context, String::NewFromUtf8(isolate, "iceUfrag")).ToLocalChecked();
-        Local<Value> icePwd = participant->Get(context, String::NewFromUtf8(isolate, "icePwd")).ToLocalChecked();
+        std::string participantId = *String::Utf8Value(participant->Get(context, String::NewFromUtf8(isolate, "participant_id")).ToLocalChecked());
+        std::string iceUfrag = *String::Utf8Value(participant->Get(context, String::NewFromUtf8(isolate, "iceUfrag")).ToLocalChecked());
+        std::string icePwd = *String::Utf8Value(participant->Get(context, String::NewFromUtf8(isolate, "icePwd")).ToLocalChecked());
 
+        WebRTCParticipantData webRTCParticipant = EnsureWebRTCParticipant(conference, participantId);
         EnsurePipeline(conference);
         EnsureElements(conference);
 
         // Initialize nice agents
         NiceAgent *niceAgentReceive = nice_agent_new(NULL, NICE_COMPATIBILITY_RFC5245);
         NiceAgent *niceAgentSend = nice_agent_new(NULL, NICE_COMPATIBILITY_RFC5245);
-        conference->conferenceData.NiceSink = niceAgentReceive;
-        conference->conferenceData.NiceSource = niceAgentSend;
+        webRTCParticipant.NiceAgentReceive = niceAgentReceive;
+        webRTCParticipant.NiceAgentSend = niceAgentSend;
 
         NiceAddress *addr = nice_address_new();
         nice_address_set_from_string(addr, "127.0.0.1");
@@ -216,14 +230,16 @@ void Conference::AddWebRTCParticipant(const FunctionCallbackInfo<Value>& args) {
         // Create gstreamer elements
         GstElement *niceSink = gst_check_setup_element("nicesink");
         GstElement *niceSource = gst_check_setup_element("nicesrc");
-        conference->conferenceData.NiceSink = niceSink;
-        conference->conferenceData.NiceSource = niceSource;
+        webRTCParticipant.NiceSink = niceSink;
+        webRTCParticipant.NiceSource = niceSource;
         g_object_set (niceSink, "agent", niceAgentReceive, "stream", niceAgentReceiveStream, "component", 1, NULL);
         g_object_set (niceSource, "agent", niceAgentSend, "stream", niceAgentSendStream, "component", 1, NULL);
+        GstStaticPadTemplate srctemplate = GST_STATIC_PAD_TEMPLATE ("src", GST_PAD_SRC, GST_PAD_ALWAYS, GST_STATIC_CAPS_ANY);
+        GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE ("src", GST_PAD_SINK, GST_PAD_ALWAYS, GST_STATIC_CAPS_ANY);
         GstPad *sourcePad = gst_check_setup_src_pad_by_name (niceSink, &srctemplate, "sink");
         GstPad *sinkPad = gst_check_setup_sink_pad_by_name (niceSource, &sinktemplate, "src");
-        conference->conferenceData.SourcePad = sourcePad;
-        conference->conferenceData.SinkPad = sinkPad;
+        webRTCParticipant.SourcePad = sourcePad;
+        webRTCParticipant.SinkPad = sinkPad;
 
         gst_element_set_state (niceSink, GST_STATE_PLAYING);
         gst_pad_set_active (sourcePad, TRUE);
