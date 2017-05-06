@@ -14,10 +14,14 @@ namespace mcu {
 
     struct WebRTCParticipantData {
         std::string ParticipantId;
-        GstElement *NiceSource;
         GstElement *JpegDec;
         GstElement *VideoConvert;
+        NiceAgent *NiceAgentReceive;
+        NiceAgent *NiceAgentSend;
         GstElement *NiceSink;
+        GstElement *NiceSrc;
+        GstPad *SourcePad;
+        GstPad *SinkPad;
     };
 
     struct ConferenceData {
